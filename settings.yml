@@ -1,0 +1,4 @@
+app:
+  port: 3000
+  foldersource: ./assets/file
+  folderoutput : ./assets/fileoutput

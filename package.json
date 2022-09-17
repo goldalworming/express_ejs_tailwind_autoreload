@@ -1,0 +1,31 @@
+{
+  "name": "express_ejs_tailwind_autoreload",
+  "version": "1.0.0",
+  "description": "Tailwind 3 With Node, Express And EJS Starter ",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js -e ejs",
+    "watch": "nodemon --ext js,ejs",
+    "dev": "concurrently \"nodemon --ext js,ejs\" \"npx tailwindcss -i ./assets/tailwind.css -o ./assets/app.css --watch\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "goldalworming",
+  "license": "ISC",
+  "dependencies": {
+    "connect-livereload": "^0.6.1",
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "fs-jetpack": "^4.3.1",
+    "js-yaml": "^4.1.0",
+    "livereload": "^0.9.3",
+    "uglify-js": "^3.16.3"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.11",
+    "concurrently": "^7.4.0",
+    "nodemon": "^2.0.15",
+    "postcss": "^8.4.16",
+    "tailwindcss": "^3.1.8"
+  }
+}

@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>File.pdf</title>
+  <link href="/assets/app.css" rel="stylesheet" />
+</head>
+
+<body class="bg-grey-100 px-3 font-sans leading-normal tracking-normal">
+  <div class="font-bold font-sans text-2xl mx-auto text-center py-4">
+        <span class="text-red-600">File</span><span>.pdf</span>
+  </div>
+  <div class="container pt-8 mx-auto"  x-data="tabledata()" x-init="init()">
+    <div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
+        <ul class="flex flex-wrap -mb-px">
+            <li class="mr-2">
+                <a @click="setTab('raw')" class="cursor-pointer inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" :class="{'text-blue-600 border-blue-600':activetab=='raw','text-gray-500 border-gray-200 border-transparent':activetab!='raw'}">Raw</a>
+            </li>
+            <li class="mr-2">
+                <a @click="setTab('renamed')" class="cursor-pointer inline-block p-4 rounded-t-lg border-b-2" :class="{'text-blue-600 border-blue-600':activetab=='renamed','text-gray-500 border-gray-200 border-transparent':activetab!='renamed'}" >Renamed</a>
+            </li>
+            <!-- <li class="mr-2">
+                <a href="#" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" :class="{'text-blue-600 border-blue-600':activetab=='uploaded','text-gray-500 border-gray-200 border-transparent':activetab!='uploaded'}">Uploaded</a>
+            </li> -->
+        </ul>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-4">
+      <template x-for="(item,idx) in data" :key="idx">
+        <a class="flex items-center shadow hover:bg-indigo-100 hover:shadow-lg hover:rounded transition duration-150 ease-in-out transform hover:scale-105 p-3 space-x-2" :href="'/file?loc='+item.loc+adtnl">
+          <!-- <img class="w-10 h-10 rounded-full mr-4" :src="`${item.profile_image}`" /> -->
+          <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+          <div class="text-sm">
+            <p class="text-gray-900 leading-none" x-text="item.name"></p>
+          </div>
+        </a>
+      </template>
+    </div>
+  </div>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    function tabledata() {
+      return {
+        activetab:"raw",
+        data : [],
+        adtnl : '',
+        async init(){
+          await this.getFiles()
+        },
+        async getFiles(){
+          this.data = []
+          if(this.activetab=='raw'){
+            url = '/allfiles'
+            this.adtnl = '&type=1'
+          }
+          if(this.activetab=='renamed'){
+            url = '/readyfiles'
+            this.adtnl = '&type=2'
+          }
+          let resp = await fetch(url)
+          data = await resp.json()
+          this.data = data.rows
+        },
+        setTab(tabName){
+          this.activetab = tabName
+          this.getFiles()
+        },
+      }
+    }
+  </script>
+</body>
+
+</html>

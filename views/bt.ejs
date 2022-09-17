@@ -1,0 +1,247 @@
+<!doctype html>
+  
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>File.pdf</title>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.0.943/pdf.min.js"></script>
+  <link href="/assets/app.css" rel="stylesheet" />
+  <style>
+      #canvas_container {
+          width: 800px;
+          height: 100vh-30px;
+          overflow: auto;
+      }
+ 
+      #canvas_container {
+        background: #333;
+        text-align: center;
+        border: solid 3px;
+      }
+  </style>
+</head>
+<body>
+      <div class="font-bold font-sans text-2xl mx-auto text-center py-4">
+        <span class="text-red-600">Kodak</span><span>alaris</span>
+        <span class="font-normal">x</span>
+        <span class="text-blue-700">METRO</span><span class="text-orange-600">NET</span>
+      </div>
+    <div class="container flex w-full p-8 text-gray-800 bg-white shadow-lg pin-r pin-y mb-4 rounded mx-auto">    
+        <div x-data="tabledata()" x-init="init()">
+            <a class="text-xl flex" href="/"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>&nbsp;Back</a>
+            <div class="mb-6">
+                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Nomor</label>
+                <input type="number" id="inputname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="isi nomor" required x-model="form.nomor" x-ref="inputname">
+            </div> 
+            <div class="mb-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Tahun</label>
+                <input type="number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="isi tahun" required x-model="form.tahun">
+            </div> 
+            <div class="mb-6"> 
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Select Jenis Dokumen</label>
+                <select class="bg-white appearance-none w-full py-1 px-4 text-black font-semibold leading-tight focus:outline-none focus:bg-white focus:border-gray-300 mt-1 dropdown-chevron border border-gray-300" x-model="form.type">
+                    <option class="text-xs" value="">--all--</option>
+                    <template x-for="obj in arrjenis" :key="obj.id">
+                      <option class="text-xs" :value="obj.id" x-text="obj.name"></option>
+                    </template>
+                </select>
+            </div> 
+            <div class="mb-6"> 
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Select Kelurahan</label>
+                <select class="bg-white appearance-none w-full py-1 px-4 text-black font-semibold leading-tight focus:outline-none focus:bg-white focus:border-gray-300 mt-1 dropdown-chevron border border-gray-300" x-model="form.kelurahan">
+                    <option class="text-xs" value="">--all--</option>
+                    <template x-for="obj in arrkelurahan" :key="obj.id">
+                      <option class="text-xs" :value="obj.id" x-text="obj.name"></option>
+                    </template>
+                </select>
+            </div> 
+            <div> 
+                <a class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer" @click="sendRename()">Save</a>
+            </div> 
+        </div>
+        <div id="my_pdf_viewer" class="mx-auto">
+            <div id="canvas_container">
+                <canvas id="pdf_renderer"></canvas>
+            </div>
+     
+            <div id="navigation_controls">
+                <button id="zoom_in"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg></button>
+                <button id="zoom_out"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path></svg></button>
+                <button id="go_previous" class="my-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                <input class="border border-gray-300" id="current_page" value="1" type="number"/>
+                <button id="go_next" class="my-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+            </div>
+     
+            <div id="zoom_controls">  
+            </div>
+        </div>
+    </div>
+    <script>
+        var myState = {
+            pdf: null,
+            currentPage: 1,
+            zoom: 1
+        }
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const loc = urlParams.get('loc');
+      
+        pdfjsLib.getDocument('/static?loc='+loc).then((pdf) => {
+      
+            myState.pdf = pdf;
+            render();
+ 
+        });
+ 
+        function render() {
+            myState.pdf.getPage(myState.currentPage).then((page) => {
+          
+                var canvas = document.getElementById("pdf_renderer");
+                var ctx = canvas.getContext('2d');
+      
+                var viewport = page.getViewport(myState.zoom);
+ 
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+          
+                page.render({
+                    canvasContext: ctx,
+                    viewport: viewport
+                });
+            });
+        }
+ 
+        document.getElementById('go_previous').addEventListener('click', (e) => {
+            if(myState.pdf == null || myState.currentPage == 1) 
+              return;
+            myState.currentPage -= 1;
+            document.getElementById("current_page").value = myState.currentPage;
+            render();
+        });
+ 
+        document.getElementById('go_next').addEventListener('click', (e) => {
+            if(myState.pdf == null || myState.currentPage > myState.pdf._pdfInfo.numPages) 
+               return;
+            myState.currentPage += 1;
+            document.getElementById("current_page").value = myState.currentPage;
+            render();
+        });
+ 
+        document.getElementById('current_page').addEventListener('keypress', (e) => {
+            if(myState.pdf == null) return;
+          
+            // Get key code
+            var code = (e.keyCode ? e.keyCode : e.which);
+          
+            // If key code matches that of the Enter key
+            if(code == 13) {
+                var desiredPage = 
+                document.getElementById('current_page').valueAsNumber;
+                                  
+                if(desiredPage >= 1 && desiredPage <= myState.pdf._pdfInfo.numPages) {
+                    myState.currentPage = desiredPage;
+                    document.getElementById("current_page").value = desiredPage;
+                    render();
+                }
+            }
+        });
+ 
+        document.getElementById('zoom_in').addEventListener('click', (e) => {
+            if(myState.pdf == null) return;
+            myState.zoom += 0.5;
+            render();
+        });
+ 
+        document.getElementById('zoom_out').addEventListener('click', (e) => {
+            if(myState.pdf == null) return;
+            myState.zoom -= 0.5;
+            render();
+        });
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script>
+        function tabledata() {
+          return {
+            data : [],
+            form:{},
+            arrjenis:[],
+            arrkelurahan:[],
+            loc :'',
+            async init(){
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                const loc = urlParams.get('loc');
+
+                this.loc = loc
+                let arloc = loc.split("/")
+                this.form.name = arloc[arloc.length-1]
+                /*$refs.inputname.focus()*/
+                document.getElementById("inputname").focus();
+                // $nextTick(() => $refs.inputname.focus());
+
+              await this.getFiles()
+            },
+            async getFiles(){
+              url = '/gvalkel'
+              let resp = await fetch(url)
+              data = await resp.json()
+
+              this.arrkelurahan = []
+              this.arrjenis = []
+              for (key in data){
+                if(key.indexOf("kelurahan")>-1){
+                    for (var i1 = 0; i1 < data[key].length; i1++) {
+                        arname = data[key][i1].split("-")
+                        this.arrkelurahan.push({id:arname[0],name:data[key][i1]})
+                    }
+                }
+                else if(key.indexOf("arrjenis")>-1){
+                    for (var i1 = 0; i1 < data[key].length; i1++) {
+                        arname = data[key][i1].split("-")
+                        this.arrjenis.push({id:arname[0],name:data[key][i1]})
+                    }
+                }
+
+              }
+            },
+            async sendRename(){
+              let destname = [this.form.type,this.form.kelurahan,this.form.nomor,this.form.tahun]
+              let finaldestname = destname.join("_")+".pdf"
+              let data = {
+                source: this.loc,
+                dest: finaldestname
+              }
+              // console.log(data)
+              const xurl = `/rename`
+              const settings = {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+              };
+              try {
+                const resp = await fetch(xurl, settings)
+                const data = await resp.json()
+
+                if (data.success) {
+                  setTimeout(function() {
+                    location.href = "/"
+                  }, 500);
+                } else {
+                  alert('Mohon Maaf Login Gagal. ' + data.message)
+                }
+
+
+                // return data;
+              } catch (e) {
+                console.log(e);
+              }
+            }
+          }
+        }
+    </script>
+</body>
+</html>
